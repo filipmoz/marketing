@@ -4,32 +4,16 @@ Export router for survey data to Excel
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import Optional
 from datetime import datetime
 import io
 
 from app.database import get_db
 from app.survey_models import SurveyResponse
 from app.survey_excel_export import SurveyExcelExporter
-from app.export_summary_draft import build_summary_text
 from app.auth import get_current_admin
 
 router = APIRouter()
 exporter = SurveyExcelExporter()
-
-@router.get("/summary")
-async def export_summary_text(
-    db: Session = Depends(get_db),
-    admin: dict = Depends(get_current_admin)
-):
-    """Draft: plain-text summary for quick checks."""
-    responses = db.query(SurveyResponse).order_by(SurveyResponse.submitted_at).all()
-    text = build_summary_text(responses)
-    return StreamingResponse(
-        io.BytesIO(text.encode("utf-8")),
-        media_type="text/plain",
-        headers={"Content-Disposition": "inline; filename=summary.txt"}
-    )
 
 @router.get("/excel")
 async def export_survey_to_excel(
@@ -62,3 +46,4 @@ async def export_survey_to_excel(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error exporting survey data: {str(e)}")
+
