@@ -2,7 +2,7 @@
 # Build script for Docker container
 
 echo "🐳 Building Docker image..."
-docker build -t survey-app:latest .
+sudo docker build -t survey-app:latest .
 
 echo "✅ Build complete!"
 echo ""

@@ -73,15 +73,28 @@ class SurveyExcelExporter:
         link_cell.font = Font(size=10, color="0066CC", underline="single")
         link_cell.hyperlink = "https://filip.kcn.pl"
         
+        # Add GitHub repository link next to the survey link
+        github_cell = sheet.cell(footer_row, 3)
+        github_cell.value = "https://github.com/filipmoz/marketing"
+        github_cell.font = Font(size=10, color="0066CC", underline="single")
+        github_cell.hyperlink = "https://github.com/filipmoz/marketing"
+
         cred_cell = sheet.cell(footer_row, 2, "Username: Survey | Password: Filip")
         cred_cell.font = Font(size=10, italic=True, color="666666")
         
         # Adjust column widths to fit the footer text if needed
         # Ensure columns A and B are wide enough for the footer
-        if sheet.column_dimensions.get('A', None) is None or sheet.column_dimensions['A'].width < 35:
-            sheet.column_dimensions['A'].width = max(sheet.column_dimensions.get('A', 0).width or 0, 35)
-        if sheet.column_dimensions.get('B', None) is None or sheet.column_dimensions['B'].width < 35:
-            sheet.column_dimensions['B'].width = max(sheet.column_dimensions.get('B', 0).width or 0, 35)
+        def _ensure_min_width(col_letter, min_width):
+            dim = sheet.column_dimensions.get(col_letter)
+            current = None
+            if dim is not None:
+                current = getattr(dim, 'width', None)
+            if current is None or current < min_width:
+                sheet.column_dimensions[col_letter].width = min_width
+
+        _ensure_min_width('A', 35)
+        _ensure_min_width('B', 35)
+        _ensure_min_width('C', 50)
     
     def export_survey_data(self, responses: List) -> BytesIO:
         """
