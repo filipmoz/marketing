@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Temporary files
+*.log
+*.tmp
+*.csv
+*.json
+*.txt
+!requirements.txt
+
+# PDF files (not needed in container)
+*.pdf
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Scripts
+setup.sh
+run.sh
+run.py
+

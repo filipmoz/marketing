@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey - Consumer Attitudes Research</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .question-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+        
+        .radio-option {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .radio-option input[type="radio"] {
+            margin: 0 auto 5px;
+            display: block;
+            transform: scale(1.2);
+        }
+        
+        .radio-option label {
+            display: block;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        
+        .scale-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        
+        .scale-info strong {
+            color: #856404;
+        }
+        
+        .full-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        
+        .full-scale-labels span {
+            flex: 1;
+            text-align: center;
+            min-width: 0;
+            font-size: 0.7em;
+        }
+        
+        /* Modal for success/error messages */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content.success {
+            border-top: 4px solid #28a745;
+        }
+        
+        .modal-content.error {
+            border-top: 4px solid #dc3545;
+        }
+        
+        .modal-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .modal-content.success .modal-icon {
+            color: #28a745;
+        }
+        
+        .modal-content.error .modal-icon {
+            color: #dc3545;
+        }
+        
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .modal-close {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Consumer Attitudes Research Survey</h1>
+            <p>Car Manufacturer Research: Fuel Prices, Global Warming & Alternative Fuels</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>Research Topic:</strong> A prominent car manufacturer is seeking to understand consumer attitudes towards fuel prices, global warming, and alternative fuels.
+            </div>
+            
+            <form id="surveyForm">
+                <!-- Attitude Questions Section -->
+                <div class="section">
+                    <div class="section-title">How do you feel about global warming, Petrol usage, and Petrol prices?</div>
+                    <div class="scale-info">
+                        <strong>Note:</strong> Indicate your degree of agreement or disagreement. The scale for each question is:<br>
+                        <strong>1</strong> = Very strongly disagree, 
+                        <strong>2</strong> = Strongly disagree, 
+                        <strong>3</strong> = Disagree, 
+                        <strong>4</strong> = Neither disagree nor agree, 
+                        <strong>5</strong> = Agree, 
+                        <strong>6</strong> = Strongly agree, 
+                        <strong>7</strong> = Very strongly agree
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">1. I am worried about global warming.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="1" id="q1_1" required><label for="q1_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="2" id="q1_2" required><label for="q1_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="3" id="q1_3" required><label for="q1_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="4" id="q1_4" required><label for="q1_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="5" id="q1_5" required><label for="q1_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="6" id="q1_6" required><label for="q1_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q1_worried_global_warming" value="7" id="q1_7" required><label for="q1_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">2. Global warming is a real threat.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="1" id="q2_1" required><label for="q2_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="2" id="q2_2" required><label for="q2_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="3" id="q2_3" required><label for="q2_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="4" id="q2_4" required><label for="q2_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="5" id="q2_5" required><label for="q2_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="6" id="q2_6" required><label for="q2_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q2_global_warming_threat" value="7" id="q2_7" required><label for="q2_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">3. British use too much Petrol.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="1" id="q3_1" required><label for="q3_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="2" id="q3_2" required><label for="q3_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="3" id="q3_3" required><label for="q3_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="4" id="q3_4" required><label for="q3_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="5" id="q3_5" required><label for="q3_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="6" id="q3_6" required><label for="q3_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q3_british_use_too_much_petrol" value="7" id="q3_7" required><label for="q3_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">4. We should be looking for Petrol substitutes.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="1" id="q4_1" required><label for="q4_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="2" id="q4_2" required><label for="q4_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="3" id="q4_3" required><label for="q4_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="4" id="q4_4" required><label for="q4_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="5" id="q4_5" required><label for="q4_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="6" id="q4_6" required><label for="q4_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q4_look_petrol_substitutes" value="7" id="q4_7" required><label for="q4_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">5. Petrol prices are too high now.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="1" id="q5_1" required><label for="q5_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="2" id="q5_2" required><label for="q5_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="3" id="q5_3" required><label for="q5_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="4" id="q5_4" required><label for="q5_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="5" id="q5_5" required><label for="q5_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="6" id="q5_6" required><label for="q5_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q5_petrol_prices_too_high" value="7" id="q5_7" required><label for="q5_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">6. High gasoline prices will impact what type of cars are purchased.</div>
+                        <div class="full-scale-labels">
+                            <span>1<br>Very strongly<br>disagree</span>
+                            <span>2<br>Strongly<br>disagree</span>
+                            <span>3<br>Disagree</span>
+                            <span>4<br>Neither</span>
+                            <span>5<br>Agree</span>
+                            <span>6<br>Strongly<br>agree</span>
+                            <span>7<br>Very strongly<br>agree</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="1" id="q6_1" required><label for="q6_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="2" id="q6_2" required><label for="q6_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="3" id="q6_3" required><label for="q6_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="4" id="q6_4" required><label for="q6_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="5" id="q6_5" required><label for="q6_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="6" id="q6_6" required><label for="q6_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="q6_high_prices_impact_cars" value="7" id="q6_7" required><label for="q6_7">7</label></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Personality Types Section -->
+                <div class="section">
+                    <div class="section-title">Personality Descriptions</div>
+                    <p style="margin-bottom: 20px; color: #666;">For each description, indicate where 1 = does not describe me at all and 7 = describes me perfectly</p>
+                    
+                    <div class="question-group">
+                        <div class="question-text">1. Novelist - very early adopter, risk taker, "way out," "show off," want to be unique and extraordinary.</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="1" id="pn_1" required><label for="pn_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="2" id="pn_2" required><label for="pn_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="3" id="pn_3" required><label for="pn_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="4" id="pn_4" required><label for="pn_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="5" id="pn_5" required><label for="pn_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="6" id="pn_6" required><label for="pn_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_novelist" value="7" id="pn_7" required><label for="pn_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">2. Innovator - early adopter, less risk taker than novelist, but into new technology; likes new products, but not "show offs".</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="1" id="pi_1" required><label for="pi_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="2" id="pi_2" required><label for="pi_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="3" id="pi_3" required><label for="pi_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="4" id="pi_4" required><label for="pi_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="5" id="pi_5" required><label for="pi_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="6" id="pi_6" required><label for="pi_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_innovator" value="7" id="pi_7" required><label for="pi_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">3. Trendsetter - opinion leaders, well off financially and educationally, often the first adopters of new trends that are adopted by most of society.</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="1" id="pt_1" required><label for="pt_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="2" id="pt_2" required><label for="pt_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="3" id="pt_3" required><label for="pt_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="4" id="pt_4" required><label for="pt_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="5" id="pt_5" required><label for="pt_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="6" id="pt_6" required><label for="pt_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_trendsetter" value="7" id="pt_7" required><label for="pt_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">4. Forerunner - early majority of population, respected and fairly well off; not opinion leaders, but adopt new products before the "average" person.</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="1" id="pf_1" required><label for="pf_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="2" id="pf_2" required><label for="pf_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="3" id="pf_3" required><label for="pf_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="4" id="pf_4" required><label for="pf_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="5" id="pf_5" required><label for="pf_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="6" id="pf_6" required><label for="pf_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_forerunner" value="7" id="pf_7" required><label for="pf_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">5. Mainstreamer - late majority of population, "average people," who are reserved and deliberate.</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="1" id="pm_1" required><label for="pm_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="2" id="pm_2" required><label for="pm_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="3" id="pm_3" required><label for="pm_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="4" id="pm_4" required><label for="pm_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="5" id="pm_5" required><label for="pm_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="6" id="pm_6" required><label for="pm_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_mainstreamer" value="7" id="pm_7" required><label for="pm_7">7</label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">6. Classic - laggards who cling to "old" ways.</div>
+                        <div class="scale-labels">
+                            <span>1 (Does not describe me at all)</span>
+                            <span>7 (Describes me perfectly)</span>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="1" id="pc_1" required><label for="pc_1">1</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="2" id="pc_2" required><label for="pc_2">2</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="3" id="pc_3" required><label for="pc_3">3</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="4" id="pc_4" required><label for="pc_4">4</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="5" id="pc_5" required><label for="pc_5">5</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="6" id="pc_6" required><label for="pc_6">6</label></div>
+                            <div class="radio-option"><input type="radio" name="personality_classic" value="7" id="pc_7" required><label for="pc_7">7</label></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Demographics Section -->
+                <div class="section">
+                    <div class="section-title">Demographics (for classification purposes)</div>
+                    
+                    <div class="form-group">
+                        <label for="gender">1. What is your gender?</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Please select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marital_status">2. What is your marital status?</label>
+                        <select id="marital_status" name="marital_status" required>
+                            <option value="">Please select...</option>
+                            <option value="Unmarried">Unmarried</option>
+                            <option value="Married">Married</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age_category">3. What is your age category?</label>
+                        <select id="age_category" name="age_category" required>
+                            <option value="">Please select...</option>
+                            <option value="18 to 34">18 to 34</option>
+                            <option value="35 to 65">35 to 65</option>
+                            <option value="65 and older">65 and older</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">Submit Survey</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal for success/error messages -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-icon" id="modalIcon"></div>
+            <div class="modal-message" id="modalMessage"></div>
+            <button class="modal-close" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api/survey';
+        const form = document.getElementById('surveyForm');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalMessage = document.getElementById('modalMessage');
+        
+        function showModal(message, isSuccess) {
+            modalMessage.textContent = message;
+            modalContent.classList.remove('success', 'error');
+            if (isSuccess) {
+                modalContent.classList.add('success');
+                modalIcon.textContent = '✅';
+            } else {
+                modalContent.classList.add('error');
+                modalIcon.textContent = '❌';
+            }
+            modalOverlay.classList.add('active');
+            // Scroll to top to ensure modal is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+        
+        // Close modal when clicking outside
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            const formData = new FormData(form);
+            const data = {
+                q1_worried_global_warming: parseInt(formData.get('q1_worried_global_warming')),
+                q2_global_warming_threat: parseInt(formData.get('q2_global_warming_threat')),
+                q3_british_use_too_much_petrol: parseInt(formData.get('q3_british_use_too_much_petrol')),
+                q4_look_petrol_substitutes: parseInt(formData.get('q4_look_petrol_substitutes')),
+                q5_petrol_prices_too_high: parseInt(formData.get('q5_petrol_prices_too_high')),
+                q6_high_prices_impact_cars: parseInt(formData.get('q6_high_prices_impact_cars')),
+                personality_novelist: parseInt(formData.get('personality_novelist')),
+                personality_innovator: parseInt(formData.get('personality_innovator')),
+                personality_trendsetter: parseInt(formData.get('personality_trendsetter')),
+                personality_forerunner: parseInt(formData.get('personality_forerunner')),
+                personality_mainstreamer: parseInt(formData.get('personality_mainstreamer')),
+                personality_classic: parseInt(formData.get('personality_classic')),
+                gender: formData.get('gender'),
+                marital_status: formData.get('marital_status'),
+                age_category: formData.get('age_category')
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    form.reset();
+                    showModal('Thank you! Your survey response has been submitted successfully.', true);
+                } else {
+                    const error = await response.json();
+                    showModal(`Error: ${error.detail || 'Failed to submit survey'}`, false);
+                }
+            } catch (error) {
+                showModal(`Error: ${error.message}`, false);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Survey';
+            }
+        });
+    </script>
+</body>
+</html>
+

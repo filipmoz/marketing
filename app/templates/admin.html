@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Data Collection - Admin Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="url"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            opacity: 0.9;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .status-collected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.active {
+            display: block;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filters select {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Research Data Collection System</h1>
+            <p>Collect, manage, and export research data</p>
+        </div>
+        
+        <div class="content">
+            <!-- Stats Section -->
+            <div class="section">
+                <div class="section-title">Statistics</div>
+                <div class="stats" id="stats">
+                    <div class="stat-card">
+                        <h3 id="total-count">0</h3>
+                        <p>Total Records</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="collected-count">0</h3>
+                        <p>Collected</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="errors-count">0</h3>
+                        <p>Errors</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="categories-count">0</h3>
+                        <p>Categories</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Collect Data Section -->
+            <div class="section">
+                <div class="section-title">Collect Data</div>
+                <div class="message" id="collect-message"></div>
+                <form id="collect-form">
+                    <div class="form-group">
+                        <label for="url">Website URL</label>
+                        <input type="url" id="url" name="url" required placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category (Optional)</label>
+                        <input type="text" id="category" name="category" placeholder="e.g., Research, News, Articles">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="extract-text" checked> Extract Text Content
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="extract-links"> Extract Links
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="extract-images"> Extract Images
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Collect Data</button>
+                </form>
+            </div>
+            
+            <!-- View Data Section -->
+            <div class="section">
+                <div class="section-title">Research Data</div>
+                <div class="filters">
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select id="filter-status">
+                        <option value="">All Status</option>
+                        <option value="collected">Collected</option>
+                        <option value="error">Error</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadData()">Refresh</button>
+                    <button class="btn btn-success" onclick="exportData()">Export to Excel</button>
+                </div>
+                <div class="loading" id="loading">Loading data...</div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>URL</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Collected At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    No data available. Start collecting data!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        // Load stats on page load
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('total-count').textContent = stats.total || 0;
+                document.getElementById('collected-count').textContent = stats.collected || 0;
+                document.getElementById('errors-count').textContent = stats.errors || 0;
+                document.getElementById('categories-count').textContent = stats.categories_count || 0;
+                
+                // Update category filter
+                const categoryFilter = document.getElementById('filter-category');
+                categoryFilter.innerHTML = '<option value="">All Categories</option>';
+                stats.categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    categoryFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Load data
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            const tbody = document.getElementById('data-tbody');
+            
+            loading.classList.add('active');
+            
+            try {
+                const category = document.getElementById('filter-category').value;
+                const status = document.getElementById('filter-status').value;
+                
+                let url = `${API_BASE}/admin/data?limit=100`;
+                if (category) url += `&category=${encodeURIComponent(category)}`;
+                if (status) url += `&status=${encodeURIComponent(status)}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                loading.classList.remove('active');
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No data found.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td><a href="${item.url}" target="_blank">${item.url.substring(0, 50)}...</a></td>
+                        <td>${item.title || 'N/A'}</td>
+                        <td>${item.category || 'N/A'}</td>
+                        <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+                        <td>${new Date(item.collected_at).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="exportSingle(${item.id})" style="padding: 6px 12px; font-size: 0.9em;">Export</button>
+                            <button class="btn btn-danger" onclick="deleteData(${item.id})" style="padding: 6px 12px; font-size: 0.9em;">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                loading.classList.remove('active');
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: red;">Error loading data.</td></tr>';
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        // Collect data
+        document.getElementById('collect-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('collect-message');
+            messageDiv.classList.remove('active', 'success', 'error');
+            
+            const formData = {
+                url: document.getElementById('url').value,
+                category: document.getElementById('category').value || null,
+                extract_text: document.getElementById('extract-text').checked,
+                extract_links: document.getElementById('extract-links').checked,
+                extract_images: document.getElementById('extract-images').checked
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/research/collect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    messageDiv.textContent = `Successfully collected data from ${result.url}`;
+                    messageDiv.classList.add('active', 'success');
+                    document.getElementById('collect-form').reset();
+                    loadStats();
+                    loadData();
+                } else {
+                    const error = await response.json();
+                    messageDiv.textContent = `Error: ${error.detail || 'Failed to collect data'}`;
+                    messageDiv.classList.add('active', 'error');
+                }
+            } catch (error) {
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.classList.add('active', 'error');
+            }
+        });
+        
+        // Export data
+        function exportData() {
+            const category = document.getElementById('filter-category').value;
+            const status = document.getElementById('filter-status').value;
+            
+            let url = `${API_BASE}/export/excel?`;
+            if (category) url += `category=${encodeURIComponent(category)}&`;
+            if (status) url += `status=${encodeURIComponent(status)}&`;
+            
+            window.location.href = url;
+        }
+        
+        // Export single
+        function exportSingle(id) {
+            window.location.href = `${API_BASE}/export/excel/${id}`;
+        }
+        
+        // Delete data
+        async function deleteData(id) {
+            if (!confirm('Are you sure you want to delete this data?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/data/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadStats();
+                    loadData();
+                } else {
+                    alert('Error deleting data');
+                }
+            } catch (error) {
+                alert('Error deleting data: ' + error.message);
+            }
+        }
+        
+        // Initialize
+        loadStats();
+        loadData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadData();
+        }, 30000);
+    </script>
+</body>
+</html>
+

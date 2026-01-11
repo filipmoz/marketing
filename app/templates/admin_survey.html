@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Survey Data Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .actions {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            font-size: 0.9em;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Survey Data Management - Admin Interface</h1>
+            <p>Quantitative Assessment - Consumer Attitudes Research</p>
+            <div style="margin-top: 10px;">
+                <a href="/admin/logout" style="color: #fff; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 4px; font-size: 14px;">Logout</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Stats Section -->
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <h3 id="total-responses">0</h3>
+                    <p>Total Responses</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="male-count">0</h3>
+                    <p>Male</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="female-count">0</h3>
+                    <p>Female</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="married-count">0</h3>
+                    <p>Married</p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="loadData()">Refresh Data</button>
+                <button class="btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+                <button class="btn btn-warning" onclick="importFromExcel()">Import from Excel</button>
+                <button class="btn btn-danger" onclick="clearDatabase()">Clear Database</button>
+            </div>
+            
+            <!-- Hidden file input for Excel import -->
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
+            
+            <!-- Data Table -->
+            <div class="loading" id="loading">Loading survey responses...</div>
+            <div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Submitted</th>
+                            <th>Q1</th>
+                            <th>Q2</th>
+                            <th>Q3</th>
+                            <th>Q4</th>
+                            <th>Q5</th>
+                            <th>Q6</th>
+                            <th>Novelist</th>
+                            <th>Innovator</th>
+                            <th>Trendsetter</th>
+                            <th>Forerunner</th>
+                            <th>Mainstreamer</th>
+                            <th>Classic</th>
+                            <th>Gender</th>
+                            <th>Marital Status</th>
+                            <th>Age Category</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-tbody">
+                        <tr>
+                            <td colspan="17" style="text-align: center; padding: 40px;">
+                                No data available. Waiting for survey responses...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api/survey';
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('total-responses').textContent = stats.total_responses || 0;
+                document.getElementById('male-count').textContent = stats.gender.male || 0;
+                document.getElementById('female-count').textContent = stats.gender.female || 0;
+                document.getElementById('married-count').textContent = stats.marital_status.married || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            const tbody = document.getElementById('data-tbody');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_BASE}/responses`);
+                const data = await response.json();
+                
+                loading.classList.remove('active');
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="17" style="text-align: center; padding: 40px;">No survey responses found.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${new Date(item.submitted_at).toLocaleString()}</td>
+                        <td>${item.q1_worried_global_warming}</td>
+                        <td>${item.q2_global_warming_threat}</td>
+                        <td>${item.q3_british_use_too_much_petrol}</td>
+                        <td>${item.q4_look_petrol_substitutes}</td>
+                        <td>${item.q5_petrol_prices_too_high}</td>
+                        <td>${item.q6_high_prices_impact_cars}</td>
+                        <td>${item.personality_novelist}</td>
+                        <td>${item.personality_innovator}</td>
+                        <td>${item.personality_trendsetter}</td>
+                        <td>${item.personality_forerunner}</td>
+                        <td>${item.personality_mainstreamer}</td>
+                        <td>${item.personality_classic}</td>
+                        <td>
+                            <select onchange="updateDemographics(${item.id}, 'gender', this.value)" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">--</option>
+                                <option value="Male" ${item.gender === 'Male' ? 'selected' : ''}>Male</option>
+                                <option value="Female" ${item.gender === 'Female' ? 'selected' : ''}>Female</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select onchange="updateDemographics(${item.id}, 'marital_status', this.value)" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">--</option>
+                                <option value="Unmarried" ${item.marital_status === 'Unmarried' ? 'selected' : ''}>Unmarried</option>
+                                <option value="Married" ${item.marital_status === 'Married' ? 'selected' : ''}>Married</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select onchange="updateDemographics(${item.id}, 'age_category', this.value)" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">--</option>
+                                <option value="18 to 34" ${item.age_category === '18 to 34' ? 'selected' : ''}>18 to 34</option>
+                                <option value="35 to 65" ${item.age_category === '35 to 65' ? 'selected' : ''}>35 to 65</option>
+                                <option value="65 and older" ${item.age_category === '65 and older' ? 'selected' : ''}>65 and older</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                loading.classList.remove('active');
+                tbody.innerHTML = '<tr><td colspan="17" style="text-align: center; padding: 40px; color: red;">Error loading data.</td></tr>';
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        async function updateDemographics(responseId, field, value) {
+            try {
+                const params = new URLSearchParams();
+                if (field === 'gender') params.append('gender', value);
+                if (field === 'marital_status') params.append('marital_status', value);
+                if (field === 'age_category') params.append('age_category', value);
+                
+                const response = await fetch(`${API_BASE}/${responseId}/demographics?${params.toString()}`, {
+                    method: 'PUT'
+                });
+                
+                if (response.ok) {
+                    loadStats();
+                    console.log(`✅ Updated ${field} for response ${responseId}`);
+                } else {
+                    alert(`Error updating ${field}`);
+                }
+            } catch (error) {
+                console.error('Error updating demographics:', error);
+                alert('Error updating demographics');
+            }
+        }
+        
+        function exportToExcel() {
+            window.location.href = `${API_BASE}/export/excel`;
+        }
+        
+        function importFromExcel() {
+            document.getElementById('excelFileInput').click();
+        }
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                alert('Please select an Excel file (.xlsx or .xls)');
+                return;
+            }
+            
+            if (!confirm(`Import data from ${file.name}? This will add new responses to the database.`)) {
+                event.target.value = '';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_BASE}/import-excel`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ Successfully imported ${result.imported_count} responses!\n⏭️  Skipped ${result.skipped_count} invalid rows.`);
+                    loadStats();
+                    loadData();
+                } else {
+                    alert(`❌ Error: ${result.detail || 'Failed to import Excel file'}`);
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                alert('❌ Error importing Excel file. Please check the console for details.');
+            }
+            
+            event.target.value = '';
+        }
+        
+        async function clearDatabase() {
+            if (!confirm('⚠️  WARNING: This will delete ALL survey responses from the database!\n\nThis action cannot be undone. Make sure you have exported a backup first.\n\nAre you absolutely sure?')) {
+                return;
+            }
+            
+            if (!confirm('⚠️  FINAL CONFIRMATION: Delete ALL survey responses?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/clear-all`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ Successfully deleted ${result.deleted_count} survey responses from the database.`);
+                    loadStats();
+                    loadData();
+                } else {
+                    alert(`❌ Error: ${result.detail || 'Failed to clear database'}`);
+                }
+            } catch (error) {
+                console.error('Clear database error:', error);
+                alert('❌ Error clearing database. Please check the console for details.');
+            }
+        }
+        
+        // Initialize
+        loadStats();
+        loadData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadData();
+        }, 30000);
+    </script>
+</body>
+</html>
+
