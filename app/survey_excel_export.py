@@ -73,14 +73,32 @@ class SurveyExcelExporter:
         link_cell.font = Font(size=10, color="0066CC", underline="single")
         link_cell.hyperlink = "https://filip.kcn.pl"
         
-        # Add GitHub repository link next to the survey link
-        github_cell = sheet.cell(footer_row, 3)
-        github_cell.value = "https://github.com/filipmoz/marketing"
-        github_cell.font = Font(size=10, color="0066CC", underline="single")
-        github_cell.hyperlink = "https://github.com/filipmoz/marketing"
-
         cred_cell = sheet.cell(footer_row, 2, "Username: Survey | Password: Filip")
         cred_cell.font = Font(size=10, italic=True, color="666666")
+        
+        # Add GitHub repository link
+        github_cell = sheet.cell(footer_row, 3)
+        github_cell.value = "Source Code: https://github.com/filipmoz/marketing"
+        github_cell.font = Font(size=10, color="0066CC", underline="single")
+        github_cell.hyperlink = "https://github.com/filipmoz/marketing"
+        
+        # Add next row with admin interface
+        footer_row += 1
+        
+        # Add admin interface link and credentials
+        admin_cell = sheet.cell(footer_row, 1)
+        admin_cell.value = "Admin: https://flip.con.pl/admin"
+        admin_cell.font = Font(size=10, color="0066CC", underline="single")
+        admin_cell.hyperlink = "https://flip.con.pl/admin"
+        
+        admin_cred_cell = sheet.cell(footer_row, 2, "Username: Survey | Password: Filip")
+        admin_cred_cell.font = Font(size=10, italic=True, color="666666")
+        
+        # Add source code link on same row
+        admin_github_cell = sheet.cell(footer_row, 3)
+        admin_github_cell.value = "Source Code: https://github.com/filipmoz/marketing"
+        admin_github_cell.font = Font(size=10, color="0066CC", underline="single")
+        admin_github_cell.hyperlink = "https://github.com/filipmoz/marketing"
         
         # Adjust column widths to fit the footer text if needed
         # Ensure columns A and B are wide enough for the footer
