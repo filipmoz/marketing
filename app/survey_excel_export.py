@@ -1172,14 +1172,26 @@ class SurveyExcelExporter:
         title_cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         title_cell.alignment = Alignment(horizontal="center", vertical="center")
         
-        row = 3
+        # Description
+        helper_sheet.merge_cells('A2:D2')
+        desc_cell = helper_sheet.cell(2, 1, "This sheet contains extracted data organized by groups for statistical analysis. The data is filtered from the Survey Data sheet.")
+        desc_cell.font = Font(size=10, italic=True, color="666666")
+        desc_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        
+        row = 4
         max_rows = len(responses) + 1
         
         # Question 3: Married and Unmarried scores
-        helper_sheet.cell(row, 1, "QUESTION 3 - T-Test Helper Data").font = Font(bold=True, size=11, color="FFFFFF")
+        helper_sheet.cell(row, 1, "QUESTION 3 - Petrol Usage T-Test (Married vs Unmarried)").font = Font(bold=True, size=11, color="FFFFFF")
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         helper_sheet.merge_cells(f'A{row}:D{row}')
-        row += 1
+        
+        helper_sheet.merge_cells(f'A{row+1}:D{row+1}')
+        desc_q3 = helper_sheet.cell(row+1, 1, "Purpose: Compare whether married vs unmarried respondents have different attitudes about British petrol usage. Uses Question 3 scores.")
+        desc_q3.font = Font(size=9, italic=True, color="666666")
+        desc_q3.alignment = Alignment(horizontal="left", wrap_text=True)
+        
+        row += 2
         
         helper_sheet.cell(row, 1, "Married Scores").font = Font(bold=True)
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")
@@ -1200,10 +1212,16 @@ class SurveyExcelExporter:
         row += 3
         
         # Question 4: ANOVA helper data (Trendsetter by age group)
-        helper_sheet.cell(row, 1, "QUESTION 4 - ANOVA Helper Data").font = Font(bold=True, size=11, color="FFFFFF")
+        helper_sheet.cell(row, 1, "QUESTION 4 - Opinion Leadership ANOVA (Trendsetter by Age Groups)").font = Font(bold=True, size=11, color="FFFFFF")
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         helper_sheet.merge_cells(f'A{row}:D{row}')
-        row += 1
+        
+        helper_sheet.merge_cells(f'A{row+1}:D{row+1}')
+        desc_q4 = helper_sheet.cell(row+1, 1, "Purpose: Compare whether different age groups have significantly different Trendsetter personality scores. Uses Question 4 (opinion leader) scores grouped by age.")
+        desc_q4.font = Font(size=9, italic=True, color="666666")
+        desc_q4.alignment = Alignment(horizontal="left", wrap_text=True)
+        
+        row += 2
         
         helper_sheet.cell(row, 1, "18 to 34").font = Font(bold=True)
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")
@@ -1228,15 +1246,21 @@ class SurveyExcelExporter:
         row += 3
         
         # Question 5: Paired t-test helper data (Females Q5 and Q4)
-        helper_sheet.cell(row, 1, "QUESTION 5 - Paired T-Test Helper Data").font = Font(bold=True, size=11, color="FFFFFF")
+        helper_sheet.cell(row, 1, "QUESTION 5 - Fuel Prices vs Alternatives Paired T-Test (Female Respondents Only)").font = Font(bold=True, size=11, color="FFFFFF")
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         helper_sheet.merge_cells(f'A{row}:D{row}')
-        row += 1
         
-        helper_sheet.cell(row, 1, "Q5 (Petrol Prices)").font = Font(bold=True)
+        helper_sheet.merge_cells(f'A{row+1}:D{row+1}')
+        desc_q5 = helper_sheet.cell(row+1, 1, "Purpose: Compare whether female respondents rate fuel prices (Q5) and petrol alternatives (Q4) differently. Paired comparison for same respondents.")
+        desc_q5.font = Font(size=9, italic=True, color="666666")
+        desc_q5.alignment = Alignment(horizontal="left", wrap_text=True)
+        
+        row += 2
+        
+        helper_sheet.cell(row, 1, "Q5 (Petrol Prices High)").font = Font(bold=True)
         helper_sheet.cell(row, 1).fill = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")
         helper_sheet.cell(row, 1).border = thin_border
-        helper_sheet.cell(row, 2, "Q4 (Alternatives)").font = Font(bold=True)
+        helper_sheet.cell(row, 2, "Q4 (Need Alternatives)").font = Font(bold=True)
         helper_sheet.cell(row, 2).fill = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")
         helper_sheet.cell(row, 2).border = thin_border
         q5_header_row = row
@@ -1261,9 +1285,10 @@ class SurveyExcelExporter:
         }
         
         # Adjust column widths
-        helper_sheet.column_dimensions['A'].width = 20
-        helper_sheet.column_dimensions['B'].width = 20
-        helper_sheet.column_dimensions['C'].width = 20
+        helper_sheet.column_dimensions['A'].width = 25
+        helper_sheet.column_dimensions['B'].width = 25
+        helper_sheet.column_dimensions['C'].width = 25
+        helper_sheet.column_dimensions['D'].width = 25
         
         # Add survey footer
         self._add_survey_footer(helper_sheet)
